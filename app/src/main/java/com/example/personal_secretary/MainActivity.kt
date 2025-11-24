@@ -17,6 +17,7 @@ import com.example.personal_secretary.ui.theme.Personal_SecretaryTheme
 import androidx.compose.ui.unit.dp
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Composable
 
 class MainActivity : ComponentActivity() {
 
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
                         MicButton { checkMicrophonePermission() }
                         OpenNotesPage()
                         OpenTasksPage()
+                        OpenWeatherPage()
 
                     }
                 }
@@ -116,6 +118,17 @@ fun OpenTasksPage() {
         context.startActivity(intent)
     }) {
         Text("Open Tasks Page")
+    }
+}
+
+@Composable
+fun OpenWeatherPage() {
+    val context = LocalContext.current
+    Button(onClick = {
+        val intent = Intent(context, WeatherActivity::class.java)
+        context.startActivity(intent)
+    }) {
+        Text("Open Weather Page")
     }
 }
 
