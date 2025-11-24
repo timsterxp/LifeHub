@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.personal_secretary.ui.theme.Personal_SecretaryTheme
+
 
 
 class TasksActivity: ComponentActivity() {
@@ -23,7 +26,9 @@ class TasksActivity: ComponentActivity() {
         setContent {
             Personal_SecretaryTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    TasksScreen()
+                    TasksScreen(
+                        onBack = { finish() }
+                    )
                 }
             }
         }
@@ -32,18 +37,34 @@ class TasksActivity: ComponentActivity() {
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksScreen(modifier: Modifier = Modifier){
- //   val tasks = TasksData.tasks
-
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .statusBarsPadding())
-    {
-        Text(
-            text="Tasks",
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
+fun TasksScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Tasks") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            Text(text = "Tasks", modifier = Modifier.padding(bottom = 12.dp))
+        }
     }
 }

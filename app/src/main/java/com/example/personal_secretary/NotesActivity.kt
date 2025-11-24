@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +22,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import androidx.compose.material3.Surface
 
 @Serializable
 data class NoteRequest(
@@ -36,8 +38,10 @@ class NotesActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Personal_SecretaryTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    NotesScreen()
+                Surface(modifier = Modifier) {
+                    NotesScreen(
+                        onBack = { finish() }
+                    )
                 }
             }
         }
@@ -46,20 +50,20 @@ class NotesActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesScreen(modifier: Modifier = Modifier) {
+fun NotesScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit
+) {
     var notes by remember { mutableStateOf(listOf<NoteModel>()) }
     var isLoading by remember { mutableStateOf(true) }
     var showForm by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // Fetch notes from backend
+    // Fetch notes
     LaunchedEffect(Unit) {
         scope.launch {
             try {
                 notes = NetworkClient.client.get("http://10.0.2.2:8080/notes").body()
-                Log.d("NotesFetch", "Received notes: $notes")
-            } catch (e: Exception) {
-                e.printStackTrace()
             } finally {
                 isLoading = false
             }
@@ -67,19 +71,32 @@ fun NotesScreen(modifier: Modifier = Modifier) {
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Notes") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { showForm = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Note")
             }
         }
     ) { paddingValues ->
+
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp)
                 .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Text(text = "Notes", modifier = Modifier.padding(bottom = 12.dp))
 
             if (isLoading) {
                 Text("Loading notes...")
@@ -98,22 +115,20 @@ fun NotesScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // Show form dialog
         if (showForm) {
             AddNoteDialog(
                 onDismiss = { showForm = false },
                 onSave = { newNote ->
                     scope.launch {
                         try {
-                            val response: HttpResponse = NetworkClient.client.post("http://10.0.2.2:8080/notes") {
-                                setBody(newNote)
-                            }
+                            val response: HttpResponse =
+                                NetworkClient.client.post("http://10.0.2.2:8080/notes") {
+                                    setBody(newNote)
+                                }
+
                             if (response.status.value in 200..299) {
-                                // Refresh notes
-                                notes = NetworkClient.client.get("http://10.0.2.2:8080/notes").body()
-                                Log.d("NotesSave", "Note saved successfully")
-                            } else {
-                                Log.e("NotesSave", "Failed to save note: ${response.status}")
+                                notes =
+                                    NetworkClient.client.get("http://10.0.2.2:8080/notes").body()
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -125,6 +140,7 @@ fun NotesScreen(modifier: Modifier = Modifier) {
         }
     }
 }
+
 
 @Composable
 fun NoteItem(note: NoteModel) {

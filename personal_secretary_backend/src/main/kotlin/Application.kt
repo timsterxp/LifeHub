@@ -14,8 +14,9 @@ import org.litote.kmongo.reactivestreams.KMongo
 import java.util.Properties
 import java.io.FileInputStream
 import io.ktor.server.request.*
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class Notes(
     val id: Int,
     val date: String,
