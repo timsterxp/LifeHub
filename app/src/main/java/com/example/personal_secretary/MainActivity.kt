@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
                         OpenNotesPage()
                         OpenTasksPage()
                         OpenWeatherPage()
+                        OpenPlaidPage()
 
                     }
                 }
@@ -129,6 +130,17 @@ fun OpenWeatherPage() {
         context.startActivity(intent)
     }) {
         Text("Open Weather Page")
+    }
+}
+
+@Composable
+fun OpenPlaidPage() {
+    val context = LocalContext.current
+    Button(onClick = {
+        val intent = Intent(context, PlaidActivity::class.java)
+        context.startActivity(intent)
+    }) {
+        Text("Open Plaid Page")
     }
 }
 

@@ -31,6 +31,7 @@
             android:exported="true"
             android:label="Task View" />
         <activity android:name=".WeatherActivity" />
+        <activity android:name=".PlaidActivity" />
     </application>
 
 </manifest>
